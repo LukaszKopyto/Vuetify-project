@@ -1,7 +1,9 @@
 <template>
-  <HelloWorld />
+  <Suspense>
+    <EmployeeTable />
+  </Suspense>
 </template>
 
 <script lang="ts" setup>
-  import HelloWorld from '@/components/HelloWorld.vue'
+  import EmployeeTable from "@/components/EmployeeTable.vue";
 </script>

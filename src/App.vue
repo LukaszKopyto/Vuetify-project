@@ -14,9 +14,16 @@
       </template>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer">
+    <v-navigation-drawer v-model="drawer" temporary>
       <v-list>
-        <v-list-item title="Menu"></v-list-item>
+        <v-list-item
+          v-for="item in menuItems"
+          :key="item.id"
+          :to="item.link"
+          link
+        >
+          <v-list-item-title>{{ item.title }}</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -31,6 +38,18 @@ import { ref } from "vue";
 import EmployeeTable from "@/components/EmployeeTable.vue";
 
 const drawer = ref(false);
+const menuItems = ref([
+  {
+    id: 1,
+    title: "Employee list",
+    link: "/",
+  },
+  {
+    id: 2,
+    title: "Form",
+    link: "/form",
+  },
+]);
 </script>
 
 ```

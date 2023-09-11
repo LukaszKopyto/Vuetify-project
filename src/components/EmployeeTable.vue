@@ -58,7 +58,13 @@
         <td>{{ item.company }}</td>
         <td class="d-flex align-center justify-space-between">
           <span>{{ item.website }}</span>
-          <v-btn color="blue-grey" class="pl-auto"> Delete </v-btn>
+          <v-btn
+            color="blue-grey"
+            class="pl-auto"
+            @click="(isOpen = true), (idToRemove = item.id)"
+          >
+            Delete
+          </v-btn>
         </td>
       </tr>
     </tbody>
@@ -70,6 +76,28 @@
     class="my-4"
     :length="length"
   ></v-pagination>
+  <v-dialog v-model="isOpen" width="auto">
+    <v-card>
+      <v-card-text>
+        Are you sure you want to remove an employee from the list?
+      </v-card-text>
+      <v-divider class="my-3" />
+      <v-card-actions>
+        <v-btn class="flex-grow-1" variant="tonal" @click="isOpen = false">
+          Close Dialog
+        </v-btn>
+        <v-btn
+          color="yellow-darken-2"
+          class="flex-grow-1"
+          variant="flat"
+          :loading="loading"
+          @click="removeEmployee"
+        >
+          Remove
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -111,9 +139,12 @@ const columns: Column[] = [
 ];
 
 const page = ref(1);
+const length = ref(0);
 const sortBy = ref<SortBy>("last_name");
 const order = ref<Order>("asc");
-const length = ref(0);
+const isOpen = ref(false);
+const idToRemove = ref<number | null>(null);
+const loading = ref(false);
 
 const isError = computed(() => !!error.value);
 const url = computed(() => {
@@ -125,9 +156,13 @@ const result = computed<Person[]>(() => {
   return data.value;
 });
 
-const { error, data, isFetching, response } = await useFetch<Person[]>(url, {
-  refetch: true,
-}).json();
+const { error, data, isFetching, response, execute } = await useFetch<Person[]>(
+  url,
+  {
+    refetch: true,
+  },
+).json();
+
 if (!length.value) {
   const num = Number(response.value?.headers?.get("x-total-count") ?? 0);
   if (typeof num === "number") {
@@ -144,6 +179,16 @@ const getIconName = (value: string) => {
   } else {
     return "mdi-chevron-down";
   }
+};
+
+const removeEmployee = async () => {
+  loading.value = true;
+  await useFetch(`http://localhost:3001/people/${idToRemove.value}`, {
+    method: "DELETE",
+  });
+  loading.value = false;
+  isOpen.value = false;
+  await execute();
 };
 </script>
 

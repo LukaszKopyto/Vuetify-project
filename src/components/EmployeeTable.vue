@@ -138,6 +138,8 @@ const columns: Column[] = [
   { text: "Website", value: "website" },
 ];
 
+const API_URL = import.meta.env?.VITE_API_BASE;
+
 const page = ref(1);
 const length = ref(0);
 const sortBy = ref<SortBy>("last_name");
@@ -148,7 +150,7 @@ const loading = ref(false);
 
 const isError = computed(() => !!error.value);
 const url = computed(() => {
-  return `http://localhost:3001/people?_page=${page.value}&_limit=10&_sort=${sortBy.value}&_order=${order.value}`;
+  return `${API_URL}?_page=${page.value}&_limit=10&_sort=${sortBy.value}&_order=${order.value}`;
 });
 
 const result = computed<Person[]>(() => {
@@ -183,7 +185,7 @@ const getIconName = (value: string) => {
 
 const removeEmployee = async () => {
   loading.value = true;
-  await useFetch(`http://localhost:3001/people/${idToRemove.value}`, {
+  await useFetch(`${API_URL}/${idToRemove.value}`, {
     method: "DELETE",
   });
   loading.value = false;

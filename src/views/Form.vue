@@ -112,14 +112,14 @@ const { value: website, errorMessage: websiteErrorMessage } =
 const submit = handleSubmit(async (values) => {
   loading.value = true;
   const newObj = JSON.stringify(values);
-  const { isFinished } = await useFetch("http://localhost:3001/people", {
+  const { isFinished } = await useFetch(`${import.meta.env.VITE_API_BASE}`, {
     method: "POST",
     headers: {
       Accept: "application.json",
       "Content-Type": "application/json",
     },
     body: newObj,
-  }).post();
+  });
   if (isFinished.value) {
     loading.value = false;
     showSnackbar.value = true;

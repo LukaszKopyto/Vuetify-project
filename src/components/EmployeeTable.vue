@@ -7,12 +7,11 @@
     elevation="24"
   >
     <span class="pr-8">
-      Something has gone wrong, please try again later.
-      <strong> Error: {{ error }} </strong>
+      {{ error }}
     </span>
   </v-snackbar>
   <v-progress-linear
-    v-if="isFetching"
+    v-show="isFetching"
     indeterminate
     height="4"
     color="yellow-darken-2"
@@ -57,11 +56,15 @@
         <td>{{ item.email }}</td>
         <td>{{ item.phone }}</td>
         <td>{{ item.company }}</td>
-        <td>{{ item.website }}</td>
+        <td class="d-flex align-center justify-space-between">
+          <span>{{ item.website }}</span>
+          <v-btn color="blue-grey" class="pl-auto"> Delete </v-btn>
+        </td>
       </tr>
     </tbody>
   </v-table>
   <v-pagination
+    v-if="result?.length"
     v-model="page"
     active-color="blue-grey-lighten-1"
     class="my-4"
@@ -75,34 +78,62 @@ import { useFetch } from "@vueuse/core";
 
 type Order = "asc" | "desc";
 
-const columns = ref([
+type SortBy =
+  | "first_name"
+  | "last_name"
+  | "email"
+  | "phone"
+  | "company"
+  | "website";
+
+type Person = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  company: string;
+  website: string;
+};
+
+type Column = {
+  text: string;
+  value: SortBy;
+};
+
+const columns: Column[] = [
   { text: "First name", value: "first_name" },
   { text: "Last name", value: "last_name" },
   { text: "Email", value: "email" },
   { text: "Phone", value: "phone" },
   { text: "Company", value: "company" },
   { text: "Website", value: "website" },
-]);
+];
 
 const page = ref(1);
-const sortBy = ref("last_name");
+const sortBy = ref<SortBy>("last_name");
 const order = ref<Order>("asc");
+const length = ref(0);
 
 const isError = computed(() => !!error.value);
-const url = computed(
-  () =>
-    `http://localhost:3001/people?_page=${page.value}&_limit=10&_sort=${sortBy.value}&_order=${order.value}`,
-);
-
-const result = computed(() => {
-  return JSON.parse(data.value as string);
-});
-const length = computed(() => {
-  if (!result.value) return 0;
-  return result.value?.length ?? 0;
+const url = computed(() => {
+  return `http://localhost:3001/people?_page=${page.value}&_limit=10&_sort=${sortBy.value}&_order=${order.value}`;
 });
 
-const { isFetching, error, data } = await useFetch(url, { refetch: true });
+const result = computed<Person[]>(() => {
+  if (!data.value) return [];
+  return data.value;
+});
+
+const { error, data, isFetching, response } = await useFetch<Person[]>(url, {
+  refetch: true,
+}).json();
+if (!length.value) {
+  const num = Number(response.value?.headers?.get("x-total-count") ?? 0);
+  if (typeof num === "number") {
+    length.value = Math.floor(num / 10);
+  }
+}
 
 const getIconName = (value: string) => {
   if (value !== sortBy.value) {

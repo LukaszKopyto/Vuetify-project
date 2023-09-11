@@ -4,14 +4,7 @@
       <template v-slot:prepend>
         <v-app-bar-nav-icon @click="drawer = !drawer" />
       </template>
-
       <v-app-bar-title> Company Employee List </v-app-bar-title>
-
-      <template v-slot:append>
-        <v-btn icon>
-          <v-icon>mdi-magnify</v-icon>
-        </v-btn>
-      </template>
     </v-app-bar>
 
     <v-navigation-drawer v-model="drawer" temporary>

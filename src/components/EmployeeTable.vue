@@ -138,7 +138,7 @@ const columns: Column[] = [
   { text: "Website", value: "website" },
 ];
 
-const API_URL = import.meta.env?.VITE_API_BASE;
+const API_URL = import.meta.env?.VITE_API_BASE ?? "http://localhost:3001/people";
 
 const page = ref(1);
 const length = ref(0);

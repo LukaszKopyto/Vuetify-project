@@ -64,6 +64,9 @@ import * as zod from "zod";
 import { useFetch } from "@vueuse/core/index";
 import { ref } from "vue";
 
+const API_URL =
+  import.meta.env?.VITE_API_BASE ?? "http://localhost:3001/people";
+
 const loading = ref(false);
 const showSnackbar = ref(false);
 
@@ -112,7 +115,7 @@ const { value: website, errorMessage: websiteErrorMessage } =
 const submit = handleSubmit(async (values) => {
   loading.value = true;
   const newObj = JSON.stringify(values);
-  const { isFinished } = await useFetch(`${import.meta.env.VITE_API_BASE}`, {
+  const { isFinished } = await useFetch(`${API_URL}`, {
     method: "POST",
     headers: {
       Accept: "application.json",
